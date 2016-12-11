@@ -1,0 +1,63 @@
+#include "opencv2/dnn.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+using namespace cv;
+using namespace cv::dnn
+
+#include <iostream>
+#include <fstream>
+#include <cvstdlib>
+
+using namespace std;
+
+void getMaxClass(dnn:Blob &probBlob, int* classId, double* classProb)
+{
+	Mat probMat = probBlob.matRefConst().reshape(1,1);
+	Point classNumber;
+	minMaxLoc(probMat,NULL,classProb,NULL,&classNumber);
+	*classId =classNumber.x;
+}
+
+int main(int argc,char*argv[])
+{
+	String modelTxt = "mnist_deploy.prototxt";
+	String modelBin = "lenet_iter_10000.caffemodel";
+	String imageFile = (argc>1) ? argv[1] : "4.png";
+
+	Ptr<dnn:Importer> importer;
+	importer = dnn::createCaffeImporter(modelTxt,modelBin);
+
+	if(!importer)
+	{
+		std::cerr << "Can't load network by using the following files: "<<std::endl;
+		std::cerr << "prototxt: " << modelTxt <<std::endl;
+		std::cerr << "caffemodel: " << modelBin << std::endl;
+		exit(-1);
+	}
+
+	Net net;
+	importer->populateNet(net);
+	improter.release();
+
+	Mat img = imread(imageFile,0);
+	if(img.empty())
+	{
+		std::cerr << "Can't read image from the file: " << imageFile << std::endl;
+		exit(-1);
+	}
+	resize(img,img,Size(28,28));
+	dnn::Blob inputBlob = cv::dnn::Bolb(img);
+
+	net.setBlob(".data",inputBlob);
+
+	net.forward();
+	
+	dnn::Blob prob = net.getBlob("prob");
+
+	int classId;
+	double classprob;
+	getMaxClass(prob,&classId,&classProb);
+	
+	std::cout << "Best class: #" <<classId << "'" <<std::endl;
+
+}
