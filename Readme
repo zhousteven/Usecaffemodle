@@ -1,0 +1,7 @@
+
+本实例是使用opencv调用对实例一训练好的mnist模型进行对输入图片的分类
+
+mnist_deploy.prototxt:修改后的prototxt文件
+lenet_train_test.prototxt: 原始的prototxt文件
+详细操作请参考我的CSDN博客:
+http://blog.csdn.net/hx1298234467/article/details/53573927
